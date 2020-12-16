@@ -14,6 +14,8 @@ public class GameOn implements Runnable{
     private static HashMap<Point3D,Boolean> AvailableP;
     private static HashMap<Integer,HashMap<Integer,Integer>> HashPoke;
     private static HashMap<Integer,HashMap<Integer,Double>> HashPokeWeight;
+    private static HashMap<CL_Agent, CL_Pokemon> Poke_Agent;
+
     public static void main(String[] a) {
         Thread client = new Thread(new GameOn());
         client.start();
@@ -69,38 +71,65 @@ public class GameOn implements Runnable{
         String fs =  game.getPokemons();
         List<CL_Pokemon> ffs = Arena.json2Pokemons(fs);
         List<CL_Pokemon> Pokelist = Arena.json2Pokemons(fs);
+
+        List<CL_Pokemon> PokeReal = Arena.json2Pokemons(fs);
+
+
+        for(int a = 0;a<PokeReal.size();a++) {
+            Arena.updateEdge(PokeReal.get(a),gg);
+        }
         for(int a = 0;a<Pokelist.size();a++) {
             Arena.updateEdge(Pokelist.get(a),gg);
         }
-        for (CL_Pokemon pokemon : Pokelist){
-            AvailableP.put(pokemon.getLocation(),false);
+        for (CL_Pokemon c: Pokelist) {
+            if(Poke_Agent.containsValue(c))
+                PokeReal.remove(c);
         }
+
+
+        //AvailableP = new HashMap<Point3D,Boolean>();
+//        for (CL_Pokemon pokemon : Pokelist){
+//            AvailableP.put(pokemon.getLocation(),false);
+//        }
         _ar.setPokemons(ffs);
         for(int i=0;i<log.size();i++) { // agents for
+            //int j = ChooseAg(log.size());// 0-log.size
             CL_Agent ag = log.get(i); // ag = next agent.
+            if(!Poke_Agent.containsKey(ag))
+            Poke_Agent.put(ag,null);
+            ////////////////////////
             int id = ag.getID();
             int dest = ag.getNextNode();
+
             int src = ag.getSrcNode();
             double v = ag.getValue();
             double speed = ag.getSpeed();
             if(dest==-1) {
                 //if (game.timeToEnd())
-                CL_Pokemon c = getPokemonClosestPlace(Pokelist,src);
+                CL_Pokemon c = getPokemonClosestPlace(PokeReal,src);
+                Poke_Agent.replace(ag,c);
+                PokeReal.remove(c);
 
                 int srcPoke = c.get_edge().getSrc();
                 int destPoke = c.get_edge().getDest();
 
                 if(src==srcPoke)
-                    dest = nextNode(gg, src,destPoke);
+                    dest = nextNode(gg, src,destPoke);// eat
                 else {
-                    dest = nextNode(gg, src, srcPoke);
+                    dest = nextNode(gg, src, srcPoke); // poke
                 }
                 game.chooseNextEdge(ag.getID(), dest);
-                AvailableP.replace(c.getLocation(),true);
+                //AvailableP.replace(c.getLocation(),true);
                 System.out.println("Agent: "+id+", val: "+v+"   turned to node: "+dest+ " speed : "+speed);
+                //System.out.println("pokemons : "+AvailableP.toString());
             }
+
         }
     }
+
+//    private static int ChooseAg(int size) {
+//
+//    }
 
     private static int getPokemonHighestValue(List<CL_Pokemon> pokelist, int src){//newwww
         int ans=0;
@@ -133,14 +162,14 @@ public class GameOn implements Runnable{
         Iterator<CL_Pokemon> It = pokelist.iterator();
         while(It.hasNext()){
             CL_Pokemon P = It.next();
-            if(AvailableP.get(P.getLocation())==false){
+            //if(AvailableP.get(P.getLocation())==false){
                 x = HashPokeWeight.get(P.get_edge().getSrc()).get(src);
                 if (x < min) {
                     min = x;
                     ans = P.get_edge().getSrc();
                     c1 = P;
                 } }
-            }
+            //}
         return c1;
     }
 
@@ -180,7 +209,9 @@ public class GameOn implements Runnable{
         //HashMap<Integer,HashMap<Integer,Double>> HashPoke;
         this.HashPoke = _ar.getWays();
         this.HashPokeWeight = _ar.getWaysWeight();
-        this.AvailableP = new HashMap<Point3D,Boolean>();
+        this.AvailableP = new HashMap<>();
+        this.Poke_Agent = new HashMap<>();
+
         _win = new MyFrame("test2 Ex2");
         _win.setSize(1000, 700);
         _win.update(_ar);
