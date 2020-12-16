@@ -173,7 +173,7 @@ public class GameOn implements Runnable{
         String g = game.getGraph();
         String fs = game.getPokemons();
         directed_weighted_graph gg = game.getJava_Graph_Not_to_be_used();
-        //gg.init(g);
+        //gg.init(g);//
         _ar = new Arena();
         _ar.setGraph(gg);
         _ar.setPokemons(Arena.json2Pokemons(fs));
