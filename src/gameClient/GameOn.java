@@ -9,12 +9,13 @@ import org.json.JSONObject;
 import java.util.*;
 
 public class GameOn implements Runnable{
-    private static MyFrame _win;
+    private static Ex2Frame _win;
     private static Arena _ar;
     private static HashMap<Point3D,Boolean> AvailableP;
     private static HashMap<Integer,HashMap<Integer,Integer>> HashPoke;
     private static HashMap<Integer,HashMap<Integer,Double>> HashPokeWeight;
     private static HashMap<CL_Agent, CL_Pokemon> Poke_Agent;
+
 
     public static void main(String[] a) {
         Thread client = new Thread(new GameOn());
@@ -40,8 +41,12 @@ public class GameOn implements Runnable{
         long dt=100;
 
         while(game.isRunning()) {
+
             moveAgants(game, gg);
+
             System.out.println();
+            //if()
+
             try {
                 if(ind%1==0) {_win.repaint();}
                 Thread.sleep(dt);
@@ -56,6 +61,7 @@ public class GameOn implements Runnable{
         System.out.println(res);
         System.exit(0);
     }
+
     /**
      * Moves each of the agents along the edge,
      * in case the agent is on a node the next destination (next edge) is chosen (randomly).
@@ -67,11 +73,10 @@ public class GameOn implements Runnable{
         String lg = game.move();
         List<CL_Agent> log = Arena.getAgents(lg, gg);
         _ar.setAgents(log);
-        //ArrayList<OOP_Point3D> rs = new ArrayList<OOP_Point3D>();
+
         String fs =  game.getPokemons();
         List<CL_Pokemon> ffs = Arena.json2Pokemons(fs);
         List<CL_Pokemon> Pokelist = Arena.json2Pokemons(fs);
-
         List<CL_Pokemon> PokeReal = Arena.json2Pokemons(fs);
 
 
@@ -85,19 +90,14 @@ public class GameOn implements Runnable{
             if(Poke_Agent.containsValue(c))
                 PokeReal.remove(c);
         }
-
-
-        //AvailableP = new HashMap<Point3D,Boolean>();
-//        for (CL_Pokemon pokemon : Pokelist){
-//            AvailableP.put(pokemon.getLocation(),false);
-//        }
         _ar.setPokemons(ffs);
-        for(int i=0;i<log.size();i++) { // agents for
-            //int j = ChooseAg(log.size());// 0-log.size
+        log = goAgentA(log);
+
+        for(int i=0;i<log.size();i++) {
             CL_Agent ag = log.get(i); // ag = next agent.
             if(!Poke_Agent.containsKey(ag))
             Poke_Agent.put(ag,null);
-            ////////////////////////
+
             int id = ag.getID();
             int dest = ag.getNextNode();
 
@@ -106,16 +106,18 @@ public class GameOn implements Runnable{
             double speed = ag.getSpeed();
             if(dest==-1) {
                 //if (game.timeToEnd())
-                CL_Pokemon c = getPokemonClosestPlace(PokeReal,src);
-                Poke_Agent.replace(ag,c);
+                CL_Pokemon c = getPokemonClosestPlace(PokeReal, src);
+                Poke_Agent.replace(ag, c);
                 PokeReal.remove(c);
 
                 int srcPoke = c.get_edge().getSrc();
                 int destPoke = c.get_edge().getDest();
 
-                if(src==srcPoke)
-                    dest = nextNode(gg, src,destPoke);// eat
-                else {
+                if (src == srcPoke) {
+                    dest = nextNode(gg, src, destPoke);// eat
+
+                }
+                    else {
                     dest = nextNode(gg, src, srcPoke); // poke
                 }
                 game.chooseNextEdge(ag.getID(), dest);
@@ -125,11 +127,9 @@ public class GameOn implements Runnable{
             }
 
         }
-    }
 
-//    private static int ChooseAg(int size) {
-//
-//    }
+        System.out.println(Poke_Agent.toString());
+    }
 
     private static int getPokemonHighestValue(List<CL_Pokemon> pokelist, int src){//newwww
         int ans=0;
@@ -153,7 +153,6 @@ public class GameOn implements Runnable{
         return pokelist.get(ans).get_edge().getSrc();
     }
 
-
     private static CL_Pokemon getPokemonClosestPlace(List<CL_Pokemon> pokelist, int src) { // check omer.
         int ans=0;
         double x=0;
@@ -173,31 +172,17 @@ public class GameOn implements Runnable{
         return c1;
     }
 
-
-//    private static int getPokemonClosestPlaceDest(List<CL_Pokemon> pokelist, int src) { // check omer.
-//        int ans=0;
-//        double x=0;
-//        double min=Double.MAX_VALUE;
-//        for (CL_Pokemon P: pokelist) {
-//            x=HashPokeWeight.get(P.get_edge().getSrc()).get(src);
-//            if(x<min) {
-//                min = x;
-//                ans= P.get_edge().getDest();
-//            }
-//        }
-//        return ans;
-//    }
-
     /**
      * a very simple random walk implementation!
      * @param g
      * @param src
-     * @return
+     * @return // <<<<<<<<<<<<<<<<<<,
      */
     private static int nextNode(directed_weighted_graph g, int src, int dest) { // src - agent.
         int ans= HashPoke.get(dest).get(src);
         return ans;
     }
+
     private void init(game_service game) {
         String g = game.getGraph();
         String fs = game.getPokemons();
@@ -212,7 +197,7 @@ public class GameOn implements Runnable{
         this.AvailableP = new HashMap<>();
         this.Poke_Agent = new HashMap<>();
 
-        _win = new MyFrame("test2 Ex2");
+        _win = new Ex2Frame("test2 Ex2");
         _win.setSize(1000, 700);
         _win.update(_ar);
         _win.show();
@@ -246,15 +231,32 @@ public class GameOn implements Runnable{
         }
         catch (JSONException e) {e.printStackTrace();}
     }
-    //call for the agent when finish Mission.
-    private static int [] BestPlace(int size)
+
+    private static List<CL_Agent> goAgentA(List<CL_Agent> log)
     {
-        int [] ans=new int [size];
-        for (int i = 0; i < size ; i++) {
-            //ans[i]=
+        List<CL_Agent> AgNew = new ArrayList<CL_Agent>();
+
+        CL_Agent [] AgentS = new CL_Agent[log.size()];
+        for (int i = 0; i<log.size(); i++){
+            AgentS [i] = log.get(i);
         }
-        return ans;
+
+        boolean sorted = false;
+        CL_Agent temp;
+        while(!sorted) {
+            sorted = true;
+            for (int i = 0; i < log.size() - 1; i++) {
+                if (AgentS[i].getSpeed() > AgentS[i+1].getSpeed()) {
+                    temp = AgentS[i];
+                    AgentS[i] = AgentS[i+1];
+                    AgentS[i+1] = temp;
+                    sorted = false;
+                }
+            }
+        }
+        for (int i = 0; i < log.size(); i++) {
+            AgNew.add(AgentS[i]);
+        }
+        return AgNew;
     }
-
-
 }
