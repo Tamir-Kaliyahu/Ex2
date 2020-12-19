@@ -17,6 +17,11 @@ public class MyFrame extends JFrame{
 	private int _ind;
 	private Arena _ar;
 	private Range2Range _w2f;
+
+	public static void main(String[] args) {
+		//MyFrame Tamir
+	}
+
 	MyFrame(String a) {
 		super(a);
 		int _ind = 0;

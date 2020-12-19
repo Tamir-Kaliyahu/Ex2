@@ -15,9 +15,9 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Ex2Frame extends JFrame {
-    private int _ind;
-    private Arena _ar;
-    private Range2Range _w2f;
+    private int _ind; // indicator
+    private Arena _ar; // current arena
+    private Range2Range _w2f; //
     Ex2Frame(String a) {
         super(a);
         int _ind = 0;

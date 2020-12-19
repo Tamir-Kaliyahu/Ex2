@@ -11,6 +11,12 @@ import java.util.*;
 public class DWGraph_Algo implements dw_graph_algorithms {
     private directed_weighted_graph gr;
 
+    /**
+     * This method returns a pointer (shallow copy) for the
+     * collection representing all the neighbors of a certain node in the graph.
+     * @param key -  Id of the relevant node
+     * @return Collection<gameClient.node_data>
+     */
     public Collection<node_data> getV(int key) {
         Collection<node_data> V = new LinkedList<>();
         for (edge_data k: gr.getE(key))
@@ -20,6 +26,15 @@ public class DWGraph_Algo implements dw_graph_algorithms {
         return  V;
     }
 
+    /**
+     *
+     * returns the the shortest path between src to dest - as an ordered List of nodes:
+     * src--> n1-->n2-->...dest
+     * @param src - source node.
+     * @param dest - destination node.
+     * @param gr - current graph to
+     * @return
+     */
     public List <node_data> Dijkstra(int src, int dest, directed_weighted_graph gr) {
         directed_weighted_graph g = this.copy();
         for(node_data r : g.getV()){
@@ -96,11 +111,10 @@ public class DWGraph_Algo implements dw_graph_algorithms {
     }
 
     /**
-     * Compute a deep copy of this weighted graph.
+     * Compute a deep copy of this directed_weighted_graph.
      *
      * @return
      */
-
     @Override
     public directed_weighted_graph copy() {
         if (gr.nodeSize() == 0) return gr;
@@ -180,7 +194,6 @@ public class DWGraph_Algo implements dw_graph_algorithms {
      * @param dest - end (target) node
      * @return
      */
-
     @Override
     public double shortestPathDist(int src, int dest) {
         if (gr.nodeSize() == 0 || gr.getNode(src) == null || gr.getNode(dest) == null) return -1;
@@ -201,7 +214,6 @@ public class DWGraph_Algo implements dw_graph_algorithms {
      * @param dest - end (target) node
      * @return
      */
-
     @Override
     public List<node_data> shortestPath(int src, int dest) {
         if (src == dest || gr.getNode(src) == null || gr.getNode(dest) == null) return null;
@@ -258,8 +270,6 @@ public class DWGraph_Algo implements dw_graph_algorithms {
         }
         return true;
     }
-
-
 
     /**
      * This method load a graph to this graph algorithm.

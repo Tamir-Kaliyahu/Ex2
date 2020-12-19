@@ -67,6 +67,11 @@ public class NodeData implements node_data, Comparable<node_data>{
         }
     }
 
+    /**
+     *  equals - Compare method - is used for Comparing objects, and letting you the option of using Priority Queue.
+     * @param other
+     * @return
+     */
     public boolean equals(Object other){
         if (!(other instanceof NodeData)) return false;
         NodeData n = (NodeData) other;
@@ -75,9 +80,7 @@ public class NodeData implements node_data, Comparable<node_data>{
         else if(n.getLocation().equals(this.getLocation())) flag = true;
         return (n.getKey()==this.getKey() && n.getTag()==this.getTag() && n.getInfo()==this.getInfo() && n.weight==this.weight
         && flag);
-
     }
-
     @Override
     public int compareTo(node_data o) {
         if (this.getWeight() < o.getWeight()) return -1;

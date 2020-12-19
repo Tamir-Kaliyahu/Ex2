@@ -144,13 +144,14 @@ public class Arena {
 //			itcurr = A.iterator();
 			System.out.println("fill hashmap of node: "+current.getKey());
 			for (node_data n: Algo.getGraph().getV()) {
-				System.out.println("now running on node: "+n.getKey());
+				//System.out.println("now running on node: "+n.getKey());
 				List<node_data> L =Algo.shortestPath(n.getKey(),dest);
 				if(L!=null)
 				curr.put(n.getKey(),L.get(1).getKey());// <<<<<<<<<<<<<<<<<<<
 			}
 			H.put(dest,curr);
 		}
+		System.out.println("Finished genereting ways!");
 		return  H;
 	}
 
@@ -170,13 +171,14 @@ public class Arena {
             HashMap<Integer,Double> curr = new HashMap<>();
 //			Iterator <node_data> itcurr;
 //			itcurr = A.iterator();
-            System.out.println("fill hashmap of node: "+current.getKey());
+            System.out.println("filling hashmap of node: "+current.getKey()+"...");
             for (node_data n: Algo.getGraph().getV()) {
-                System.out.println("now running on node: "+n.getKey());
+                //System.out.println("now running on node: "+n.getKey());
                 curr.put(n.getKey(),Algo.shortestPathDist(n.getKey(),dest));// <<<<<<<<<<<<<<<<<<<
             }
             H.put(dest,curr);
         }
+		System.out.println("Finished genereting paths weight.");
         return  H;
     }
 
