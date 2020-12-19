@@ -1,18 +1,16 @@
+package gameClient;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class GameOnTest {
+class ArenaTest {
 
     @Test
-    void main() {
+    void getWays() {
     }
 
     @Test
-
-    @Test
-    void chooseLvl() {
+    void getWaysWeight() {
     }
-
-
 }

@@ -79,7 +79,7 @@ public class GameOn implements Runnable {
 
     /**
      * Moves each of the agents along the edge,
-     * in case the agent is on a node the next destination (next edge) is chosen (randomly).
+     * in case the agent is on a node the next destination (next edge) is chosen.
      *
      * @param game
      * @param gg
@@ -355,6 +355,7 @@ public class GameOn implements Runnable {
      * @param epsilon - the area we want to explore around the source node
      * @return
      */
+    //
     private static int NearbyPoke(int src, List<CL_Pokemon> Poke_List, double epsilon)
     {
         int ans =0;
@@ -371,6 +372,7 @@ public class GameOn implements Runnable {
      * this method create a GUI to get ID and level from the user.
      * @param CurLvl - the StartFrame object that initiates the GUI
      */
+    // ?
     public static void ChooseLvl(StartFrame CurLvl)
     {
         StartFrame level = CurLvl;

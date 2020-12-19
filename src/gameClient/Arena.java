@@ -54,15 +54,17 @@ public class Arena {
 		
 	}
 	public List<CL_Agent> getAgents() {return _agents;}
-	public List<CL_Pokemon> getPokemons() {return _pokemons;}
 
+	public List<CL_Pokemon> getPokemons() {return _pokemons;}
 	
 	public directed_weighted_graph getGraph() {
 		return _gg;
 	}
+
 	public List<String> get_info() {
 		return _info;
 	}
+
 	public void set_info(List<String> _info) {
 		this._info = _info;
 	}
@@ -84,6 +86,7 @@ public class Arena {
 		}
 		return ans;
 	}
+
 	public static ArrayList<CL_Pokemon> json2Pokemons(String fs) {
 		ArrayList<CL_Pokemon> ans = new  ArrayList<CL_Pokemon>();
 		try {
@@ -103,6 +106,7 @@ public class Arena {
 		catch (JSONException e) {e.printStackTrace();}
 		return ans;
 	}
+
 	public static void updateEdge(CL_Pokemon fr, directed_weighted_graph g) {
 		//	oop_edge_data ans = null;
 		Iterator<node_data> itr = g.getV().iterator();
@@ -116,16 +120,7 @@ public class Arena {
 			}
 		}
 	}
-	// gets pokemon and graph, return int of node that pokemon goes from.
-	protected static int PokeSRC(CL_Pokemon c)
-	{
-		int ans;
-		if(c.getType()<0)
-			ans = c.get_edge().getSrc();
-		else
-			ans = c.get_edge().getDest();
-		return ans;
-	}
+
 	protected HashMap <Integer,HashMap<Integer,Integer>> getWays()
 	{
 		HashMap <Integer,HashMap<Integer,Integer>> H = new HashMap<>();
@@ -190,11 +185,13 @@ public class Arena {
 		if(dist>d1-EPS2) {ans = true;}
 		return ans;
 	}
+
 	private static boolean isOnEdge(geo_location p, int s, int d, directed_weighted_graph g) {
 		geo_location src = g.getNode(s).getLocation();
 		geo_location dest = g.getNode(d).getLocation();
 		return isOnEdge(p,src,dest);
 	}
+
 	private static boolean isOnEdge(geo_location p, edge_data e, int type, directed_weighted_graph g) {
 		int src = g.getNode(e.getSrc()).getKey();
 		int dest = g.getNode(e.getDest()).getKey();
@@ -225,6 +222,7 @@ public class Arena {
 		Range yr = new Range(y0,y1);
 		return new Range2D(xr,yr);
 	}
+
 	public static Range2Range w2f(directed_weighted_graph g, Range2D frame) {
 		Range2D world = GraphRange(g);
 		Range2Range ans = new Range2Range(world, frame);
