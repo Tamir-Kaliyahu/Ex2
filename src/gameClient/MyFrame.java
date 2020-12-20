@@ -19,7 +19,7 @@ public class MyFrame extends JFrame{
 	private Range2Range _w2f;
 
 	public static void main(String[] args) {
-		//MyFrame Tamir
+
 	}
 
 	MyFrame(String a) {

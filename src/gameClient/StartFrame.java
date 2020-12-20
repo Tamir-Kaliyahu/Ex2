@@ -12,7 +12,7 @@ class StartFrame extends JFrame implements ActionListener {
         static JLabel l;
         static JTextField t2;
         static JLabel l2;
-        private GameOn G;
+        private Ex2 G;
         private static int lvl;
         private static int id;
 
@@ -39,7 +39,7 @@ class StartFrame extends JFrame implements ActionListener {
                 this.id = Integer.parseInt(t2.getText());
                 System.out.println(this.id);
                 f.setVisible(false);
-                Thread client = new Thread(new GameOn());
+                Thread client = new Thread(new Ex2());
                 client.start();
 
             }

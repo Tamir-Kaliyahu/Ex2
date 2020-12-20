@@ -2,6 +2,7 @@ package gameClient;
 
 import api.*;
 import Server.Game_Server_Ex2;
+import gameClient.util.Point3D;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -9,7 +10,7 @@ import javax.swing.*;
 import java.util.*;
 import java.util.List;
 
-public class GameOn implements Runnable {
+public class Ex2 implements Runnable {
 
     private static Ex2Frame _win;
     private static StartFrame _login;
@@ -17,11 +18,9 @@ public class GameOn implements Runnable {
     private static double Eps=0;
     private static int LVL;
     private static int ID;
-    private static double maxSpeed;
-    private static HashMap<CL_Agent,Boolean> AgAngry; // <<< or hashmap
     private static HashMap<Integer, HashMap<Integer, Integer>> HashPoke;
     private static HashMap<Integer, HashMap<Integer, Double>> HashPokeWeight;
-    private static HashMap<CL_Agent, CL_Pokemon> Poke_Agent;
+    private static HashMap<Integer, Point3D> Poke_Agent;
 
     // omer>>>>> write together wiki.
     public static void main(String[] a) {
@@ -79,7 +78,7 @@ public class GameOn implements Runnable {
 
     /**
      * Moves each of the agents along the edge,
-     * in case the agent is on a node the next destination (next edge) is chosen.
+     * in case the agent is on a node the next destination (next edge) is chosen (randomly).
      *
      * @param game
      * @param gg
@@ -89,16 +88,6 @@ public class GameOn implements Runnable {
         String lg = game.move();
         List<CL_Agent> log = Arena.getAgents(lg, gg);
         _ar.setAgents(log);
-
-        AgAngry = new HashMap<CL_Agent,Boolean>();  //int [log.size()];
-        maxSpeed=0;
-        for (CL_Agent c1: log) {
-            AgAngry.put(c1,false);
-            if(c1.getSpeed()>maxSpeed)
-             maxSpeed=c1.getSpeed();
-        }
-
-
         String fs = game.getPokemons();
         List<CL_Pokemon> ffs = Arena.json2Pokemons(fs);
         List<CL_Pokemon> Pokelist = Arena.json2Pokemons(fs);
@@ -113,49 +102,47 @@ public class GameOn implements Runnable {
         }
         for (CL_Pokemon c : Pokelist) {
 
-            if (Poke_Agent.containsValue(c))
+            if (Poke_Agent.containsValue(c.getLocation())) {
                 PokeReal.remove(c);
+            }
         }
         _ar.setPokemons(ffs);
         log = goAgentA(log);
 
         boolean flag = false;
         int destForFast=0;
-        int [] agentsList = new int [log.size()];
-        for (CL_Pokemon c: Pokelist
-             ) {
+        for (CL_Pokemon c: Pokelist) {
             if(NearbyPoke(c.get_edge().getSrc(),Pokelist,Eps)>Pokelist.size()/2) {
                 flag = true;
+                int srcVal=getPokemonHighestValue(PokeReal).get_edge().getSrc();
+                if (NearbyPoke(srcVal,Pokelist,Eps)>Pokelist.size()/3){
+                    destForFast = srcVal;
+                    System.out.println("srcval" + srcVal);
+                    break;
+                }
                 destForFast = c.get_edge().getSrc();
+                System.out.println("destforfast: " + destForFast+" destination poke"+c.get_edge().getDest()+")");
                 break;
             }
         }
-
+        int counterDest =0;
         for (int i = 0; i < log.size(); i++) {
-
-
-            CL_Agent ag = log.get(i); // ag = next agent.
-            if (!Poke_Agent.containsKey(ag))
-                Poke_Agent.put(ag, null);
-            if(ag.getSpeed()>1.0&&ag.getSpeed()>maxSpeed)
-                AgAngry.replace(ag,true); // also if theres nearby 4
-            int id = ag.getID();
+            CL_Agent ag = log.get(i);
+            if (!Poke_Agent.containsKey(ag.getID())) {
+                Poke_Agent.put(ag.getID(), null);
+            }
             int dest = ag.getNextNode();
-
             int src = ag.getSrcNode();
-            double v = ag.getValue();
-            double speed = ag.getSpeed();
             if (dest == -1) {
-                if(i==log.size()-1 &&flag==true) {
+                counterDest++;
+                if(log.size()>1 && i==log.size()-1 &&flag==true) {
                     dest = destForFast;
                     System.out.println("agent go to area! node: "+dest);
-
                 } else {
-
-                    //if (game.timeToEnd())
                     CL_Pokemon c = getPokemonClosestPlace(PokeReal, src);
-                    Poke_Agent.replace(ag, c);
-                    PokeReal.remove(c); // omer < remove also others?
+                    Poke_Agent.replace(ag.getID(), c.getLocation());
+                    System.out.println(Poke_Agent.toString()+"\n.........");
+                    PokeReal.remove(c);
 
                     int srcPoke = c.get_edge().getSrc();
                     int destPoke = c.get_edge().getDest();
@@ -171,6 +158,7 @@ public class GameOn implements Runnable {
                 game.chooseNextEdge(ag.getID(), dest);
             }
         }
+        //System.out.println("counter dest -1: "+counterDest);
     }
 
     /**
@@ -262,6 +250,7 @@ public class GameOn implements Runnable {
             line = new JSONObject(info);
             JSONObject ttt = line.getJSONObject("GameServer");
             int rs = ttt.getInt("agents");
+
             ArrayList<CL_Pokemon> cl_fs = Arena.json2Pokemons(game.getPokemons());
             for (int a = 0; a < cl_fs.size(); a++) {
                 Arena.updateEdge(cl_fs.get(a), gg);
@@ -281,6 +270,7 @@ public class GameOn implements Runnable {
                 else
                     game.addAgent(PokeLoc[0].get_edge().getSrc());
             }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -355,7 +345,6 @@ public class GameOn implements Runnable {
      * @param epsilon - the area we want to explore around the source node
      * @return
      */
-    //
     private static int NearbyPoke(int src, List<CL_Pokemon> Poke_List, double epsilon)
     {
         int ans =0;
@@ -372,11 +361,10 @@ public class GameOn implements Runnable {
      * this method create a GUI to get ID and level from the user.
      * @param CurLvl - the StartFrame object that initiates the GUI
      */
-    // ?
     public static void ChooseLvl(StartFrame CurLvl)
     {
         StartFrame level = CurLvl;
-        level.f = new JFrame("ChooseLevel");
+        level.f = new JFrame("START GAME");
         level.l = new JLabel("Enter level :");
         level.l2 = new JLabel("Enter ID :");
         level.b = new JButton("submit");

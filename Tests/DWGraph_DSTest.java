@@ -1,62 +1,105 @@
-import api.DWGraph_DS;
-import api.NodeData;
-import api.node_data;
+import api.*;
 import org.junit.jupiter.api.Assertions;
+
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class DWGraph_DSTest {
 
     @org.junit.jupiter.api.Test
-    void getNode() {
+    void getNode_addNode_removeNode() {
         DWGraph_DS g1 = small_graph();
-        g1.getNode(1);
-        g1.getNode(2);
+        g1.getNode(1).setTag(2);
+        g1.getNode(1).setInfo("hello");
+        DWGraph_DS g2 = new DWGraph_DS();
+        node_data n = new NodeData(1);
+        n.setTag(2);
+        n.setInfo("hello");
+        g2.addNode(n);
+        g2.getNode(1);
+        assertEquals(g1.getNode(1),g2.getNode(1));
+        g2.removeNode(1);
+        assertNull(g2.getNode(1));
 
-    }
-
-    @org.junit.jupiter.api.Test
-    void getEdge() {
-    }
-
-    @org.junit.jupiter.api.Test
-    void addNode() {
-    }
-
-    @org.junit.jupiter.api.Test
-    void connect() {
-        DWGraph_DS g1 = small_graph();
         g1.connect(1,4,12.0);
         g1.connect(2,5,1.0);
-        Assertions.assertEquals(g1.getEdge(5,2),null);
-        g1.connect(5,2,6.0);
+        g1.connect(2,4,3.0);
+        g1.connect(3,2,2.0);
+        g1.removeEdge(1,4);
+        assertEquals(3,g1.edgeSize());
+        g1.removeEdge(2,1);
+        g1.removeEdge(4,2);
+        assertEquals(3,g1.edgeSize());
+        assertNull(g1.removeEdge(4,2));
+    }
 
-        Assertions.assertEquals(g1.getEdge(2,5).getWeight(),1.0);
+    @org.junit.jupiter.api.Test
+    void getEdge_connect() {
+        DWGraph_DS g1 = small_graph();
+        EdgeData e = new EdgeData(1,4,12.0);
+        g1.connect(1,4,12.0);
+        assertEquals(g1.getEdge(1,4),e);
+
+        g1.connect(2,5,1.0);
+        assertEquals(g1.getEdge(5,2),null);
+
+        g1.connect(5,2,6.0);
+        assertEquals(g1.getEdge(2,5).getWeight(),1.0);
 
         g1.connect(3,6,5);
-        Assertions.assertEquals(g1.getEdge(3,6),null);
+        assertEquals(g1.getEdge(3,6),null);
 
     }
 
     @org.junit.jupiter.api.Test
     void getV() {
+        DWGraph_DS g1 = small_graph();
+        ArrayList<node_data> c = new ArrayList<node_data>();
+        c.add(g1.getNode(1));
+        c.add(g1.getNode(2));
+        c.add(g1.getNode(3));
+        c.add(g1.getNode(4));
+        c.add(g1.getNode(5));
+        int i= 0;
+        for (node_data n : g1.getV()){
+            assertEquals(c.get(i),n);
+            i++;
+        }
+        i = 0;
+        g1.removeNode(1);
+        for (node_data n : g1.getV()){
+            assertNotEquals(c.get(i),n);
+        }
     }
 
     @org.junit.jupiter.api.Test
     void getE() {
-    }
-
-    @org.junit.jupiter.api.Test
-    void removeNode() {
         DWGraph_DS g1 = small_graph();
         g1.connect(1,4,12.0);
         g1.connect(2,5,1.0);
         g1.connect(2,4,3.0);
+        g1.connect(2,3,7.0);
         g1.connect(3,2,2.0);
-        Assertions.assertEquals(4,g1.edgeSize());
-        g1.removeNode(2);
-        Assertions.assertEquals(1,g1.edgeSize());
+        ArrayList<edge_data> c = new ArrayList<edge_data>();
+        c.add(g1.getEdge(2,3));
+        c.add(g1.getEdge(2,4));
+        c.add(g1.getEdge(2,5));
+        int i= 0;
+        for (edge_data e : g1.getE(2)){
+            assertEquals(c.get(i),e);
+            i++;
+        }
+        i = 0;
+        g1.removeNode(3);
+        for (edge_data e : g1.getE(2)){
+            assertNotEquals(c.get(i),e);
+        }
+
+
     }
+
+
 
     @org.junit.jupiter.api.Test
     void removeEdge() {
@@ -75,14 +118,30 @@ class DWGraph_DSTest {
 
     @org.junit.jupiter.api.Test
     void nodeSize() {
+        DWGraph_DS g1 = small_graph();
+        assertEquals(5,g1.nodeSize());
+
     }
 
     @org.junit.jupiter.api.Test
     void edgeSize() {
+        DWGraph_DS g1 = small_graph();
+        assertEquals(0,g1.edgeSize());
+
+        g1.connect(1,4,12.0);
+        g1.connect(2,5,1.0);
+        g1.connect(2,4,3.0);
+        g1.connect(3,2,2.0);
+        assertEquals(4,g1.edgeSize());
     }
 
     @org.junit.jupiter.api.Test
     void getMC() {
+        DWGraph_DS g1 = small_graph();
+        assertEquals(5,g1.getMC());
+
+        g1.connect(1,4,12.0);
+        assertEquals(6,g1.getMC());
     }
 
 
