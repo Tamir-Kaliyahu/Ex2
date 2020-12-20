@@ -14,7 +14,7 @@ class StartFrame extends JFrame implements ActionListener {
         static JLabel l2;
         private Ex2 G;
         private static int lvl;
-        private static int id;
+        private static long id;
 
 
         public static int getLvl()
@@ -22,22 +22,18 @@ class StartFrame extends JFrame implements ActionListener {
             return lvl;
         }
 
-        public static int getId()
+        public static long getId()
         {
            return id;
         }
 
-
-        // if the vutton is pressed
         public void actionPerformed(ActionEvent e)
         {
             String s = e.getActionCommand();
             if (s.equals("submit")) {
                 // set the text of the label to the text of the field
                 this.lvl = Integer.parseInt(t.getText());
-                System.out.println(this.lvl);
-                this.id = Integer.parseInt(t2.getText());
-                System.out.println(this.id);
+                this.id = Long.parseLong(t2.getText());
                 f.setVisible(false);
                 Thread client = new Thread(new Ex2());
                 client.start();

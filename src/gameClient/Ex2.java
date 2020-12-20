@@ -12,29 +12,30 @@ import java.util.List;
 
 public class Ex2 implements Runnable {
 
-    private static Ex2Frame _win;
+    private static Ex2Frame ExFrame;
     private static StartFrame _login;
     private static Arena _ar;
     private static double Eps=0;
     private static int LVL;
-    private static int ID;
+    private static long IDlong;
+    public static boolean exe;
+
     private static HashMap<Integer, HashMap<Integer, Integer>> HashPoke;
     private static HashMap<Integer, HashMap<Integer, Double>> HashPokeWeight;
     private static HashMap<Integer, Point3D> Poke_Agent;
 
-    // omer>>>>> write together wiki.
     public static void main(String[] a) {
-//        Thread client = new Thread(new GameOn());
-//        client.start();
         if(a.length==0) {
             _login = new StartFrame();
             ChooseLvl(_login);
+            exe=true;
         }else
         {
-            Scanner in = new Scanner(System.in);
-            System.out.println("please enter level: [0-23]");
+            setID(Long.parseLong(a[0]));
+            setLVL(Integer.parseInt(a[1]));
+            Thread client = new Thread(new Ex2());
+            client.start();
         }
-
 
     }
 
@@ -43,27 +44,27 @@ public class Ex2 implements Runnable {
      */
     @Override
     public void run() {
-        LVL=_login.getLvl();
-        ID = _login.getId();
+        if(exe) {
+            setLVL(_login.getLvl());
+            setID(_login.getId());
+        }
         int scenario_num = LVL;
-        game_service game = Game_Server_Ex2.getServer(scenario_num); // you have [0,23] games
-        //	int id = 999;
-        //game.login(Login());
+        game_service game = Game_Server_Ex2.getServer(scenario_num);
+        game.login(IDlong);
         String g = game.getGraph();
         String pks = game.getPokemons();
         directed_weighted_graph gg = game.getJava_Graph_Not_to_be_used();
         init(game);
         game.startGame();
-        _win.setTitle("Ex2 - Pokemon: " + game.toString());
+        ExFrame.setTitle("Ex2 - Pokemon: " + game.toString());
         int ind = 0;
         long dt = 100;
-
         while (game.isRunning()) {
             moveAgants(game, gg);
 
             try {
                 if (ind % 1 == 0) {
-                    _win.repaint();
+                    ExFrame.repaint();
                 }
                 Thread.sleep(dt);
                 ind++;
@@ -93,7 +94,6 @@ public class Ex2 implements Runnable {
         List<CL_Pokemon> Pokelist = Arena.json2Pokemons(fs);
         List<CL_Pokemon> PokeReal = Arena.json2Pokemons(fs);
 
-
         for (int a = 0; a < PokeReal.size(); a++) {
             Arena.updateEdge(PokeReal.get(a), gg);
         }
@@ -101,31 +101,21 @@ public class Ex2 implements Runnable {
             Arena.updateEdge(Pokelist.get(a), gg);
         }
         for (CL_Pokemon c : Pokelist) {
-
             if (Poke_Agent.containsValue(c.getLocation())) {
                 PokeReal.remove(c);
             }
         }
         _ar.setPokemons(ffs);
         log = goAgentA(log);
-
         boolean flag = false;
         int destForFast=0;
         for (CL_Pokemon c: Pokelist) {
             if(NearbyPoke(c.get_edge().getSrc(),Pokelist,Eps)>Pokelist.size()/2) {
                 flag = true;
-                int srcVal=getPokemonHighestValue(PokeReal).get_edge().getSrc();
-                if (NearbyPoke(srcVal,Pokelist,Eps)>Pokelist.size()/3){
-                    destForFast = srcVal;
-                    System.out.println("srcval" + srcVal);
-                    break;
-                }
                 destForFast = c.get_edge().getSrc();
-                System.out.println("destforfast: " + destForFast+" destination poke"+c.get_edge().getDest()+")");
                 break;
             }
         }
-        int counterDest =0;
         for (int i = 0; i < log.size(); i++) {
             CL_Agent ag = log.get(i);
             if (!Poke_Agent.containsKey(ag.getID())) {
@@ -134,14 +124,14 @@ public class Ex2 implements Runnable {
             int dest = ag.getNextNode();
             int src = ag.getSrcNode();
             if (dest == -1) {
-                counterDest++;
                 if(log.size()>1 && i==log.size()-1 &&flag==true) {
                     dest = destForFast;
-                    System.out.println("agent go to area! node: "+dest);
+                    CL_Pokemon c = getPokemonClosestPlace(PokeReal, destForFast);
+                    Poke_Agent.replace(ag.getID(), c.getLocation());
+
                 } else {
                     CL_Pokemon c = getPokemonClosestPlace(PokeReal, src);
                     Poke_Agent.replace(ag.getID(), c.getLocation());
-                    System.out.println(Poke_Agent.toString()+"\n.........");
                     PokeReal.remove(c);
 
                     int srcPoke = c.get_edge().getSrc();
@@ -149,8 +139,6 @@ public class Ex2 implements Runnable {
 
                     if (src == srcPoke) {
                         dest = nextNode(gg, src, destPoke);// eat
-
-
                     } else {
                         dest = nextNode(gg, src, srcPoke); // poke
                     }
@@ -158,7 +146,7 @@ public class Ex2 implements Runnable {
                 game.chooseNextEdge(ag.getID(), dest);
             }
         }
-        //System.out.println("counter dest -1: "+counterDest);
+
     }
 
     /**
@@ -182,7 +170,6 @@ public class Ex2 implements Runnable {
                 ans = z;
             }
         }
-        System.out.println("highest value :" + highestval);
         return pokelist.get(ans);
     }
 
@@ -240,10 +227,11 @@ public class Ex2 implements Runnable {
 
 
 
-        _win = new Ex2Frame("Ex2");
-        _win.setSize(900, 800);
-        _win.update(_ar);
-        _win.show();
+        ExFrame = new Ex2Frame("Ex2",game);
+
+        ExFrame.setSize(900, 800);
+        ExFrame.update(_ar);
+        ExFrame.show();
         String info = game.toString();
         JSONObject line;
         try {
@@ -255,9 +243,7 @@ public class Ex2 implements Runnable {
             for (int a = 0; a < cl_fs.size(); a++) {
                 Arena.updateEdge(cl_fs.get(a), gg);
             }
-
-
-            CL_Pokemon[] PokeLoc = new CL_Pokemon[cl_fs.size()];//
+            CL_Pokemon[] PokeLoc = new CL_Pokemon[cl_fs.size()];
             int cl_size = cl_fs.size();
             for (int a = 0; a < cl_size; a++) {
                 PokeLoc[a] = getPokemonHighestValue(cl_fs);
@@ -306,6 +292,7 @@ public class Ex2 implements Runnable {
         for (int i = 0; i < log.size(); i++) {
             AgNew.add(AgentS[i]);
         }
+        //
         return AgNew;
     }
 
@@ -361,7 +348,7 @@ public class Ex2 implements Runnable {
      * this method create a GUI to get ID and level from the user.
      * @param CurLvl - the StartFrame object that initiates the GUI
      */
-    public static void ChooseLvl(StartFrame CurLvl)
+    private static void ChooseLvl(StartFrame CurLvl)
     {
         StartFrame level = CurLvl;
         level.f = new JFrame("START GAME");
@@ -380,6 +367,16 @@ public class Ex2 implements Runnable {
         level.f.add(p);
         level.f.setSize(300, 300);
         level.f.show();
+    }
+
+    private static void setID(long id)
+    {
+        IDlong=id;
+    }
+
+    private static void setLVL(int lv)
+    {
+        LVL=lv;
     }
 
 }

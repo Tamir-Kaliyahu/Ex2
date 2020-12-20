@@ -1,9 +1,6 @@
 package gameClient;
 
-import api.directed_weighted_graph;
-import api.edge_data;
-import api.geo_location;
-import api.node_data;
+import api.*;
 import gameClient.util.Point3D;
 import gameClient.util.Range;
 import gameClient.util.Range2D;
@@ -18,17 +15,20 @@ public class Ex2Frame extends JFrame {
     private int _ind; // indicator
     private Arena _ar; // current arena
     private Range2Range _w2f; //
+    private game_service game;
 
 
 
 
-    Ex2Frame(String a) {
+    Ex2Frame(String a, game_service game) {
         super(a);
+        this.game=game;
         int _ind = 0;
+
     }
     public void update(Arena ar) {
         this._ar = ar;
-        updateFrame();
+        //updateFrame();
     }
 
     private void updateFrame() {
@@ -42,11 +42,12 @@ public class Ex2Frame extends JFrame {
         int w = this.getWidth();
         int h = this.getHeight();
         g.clearRect(0, 0, w, h);
-        //	updateFrame();
+        updateFrame();
         drawPokemons(g);
         drawGraph(g);
         drawAgants(g);
         drawInfo(g);
+        drawTime(g);
 
 
     }
@@ -103,13 +104,17 @@ public class Ex2Frame extends JFrame {
         while(rs!=null && i<rs.size()) {
             geo_location c = rs.get(i).getLocation();
             int r=8;
-            i++;
+
             if(c!=null) {
 
                 geo_location fp = this._w2f.world2frame(c);
                 g.fillOval((int)fp.x()-r, (int)fp.y()-r, 2*r, 2*r);
+                g.drawString(""+rs.get(i).getValue(),(int) fp.x()-2*r,(int) fp.y() - 2*r);
             }
+            i++;
+
         }
+
     }
     private void drawNode(node_data n, int r, Graphics g) {
         geo_location pos = n.getLocation();
@@ -126,4 +131,13 @@ public class Ex2Frame extends JFrame {
         g.drawLine((int)s0.x(), (int)s0.y(), (int)d0.x(), (int)d0.y());
         //	g.drawString(""+n.getKey(), fp.ix(), fp.iy()-4*r);
     }
+
+    private void drawTime(Graphics g)
+    {
+        String min = String.valueOf(game.timeToEnd()/100000);
+        String sec = String.valueOf(game.timeToEnd()/1000);
+        g.setColor(Color.BLUE);
+        g.drawString("Time remaining: "+min+":"+sec,80,50);
+    }
+
 }

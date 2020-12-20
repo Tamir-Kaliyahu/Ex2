@@ -121,6 +121,7 @@ public class Arena {
 		}
 	}
 
+
 	protected HashMap <Integer,HashMap<Integer,Integer>> getWays()
 	{
 		HashMap <Integer,HashMap<Integer,Integer>> H = new HashMap<>();
@@ -133,16 +134,12 @@ public class Arena {
 			int dest = current.getKey();
 			DWGraph_Algo Algo = new DWGraph_Algo();
 			Algo.init(this._gg);
-			//Algo.shortestPathDist(current.getKey(),this._gg.getE(current.getKey()).iterator().next().getDest());
 			HashMap<Integer,Integer> curr = new HashMap<>();
-//			Iterator <node_data> itcurr;
-//			itcurr = A.iterator();
-			System.out.println("fill hashmap of node: "+current.getKey());
+
 			for (node_data n: Algo.getGraph().getV()) {
-				//System.out.println("now running on node: "+n.getKey());
 				List<node_data> L =Algo.shortestPath(n.getKey(),dest);
 				if(L!=null)
-				curr.put(n.getKey(),L.get(1).getKey());// <<<<<<<<<<<<<<<<<<<
+				curr.put(n.getKey(),L.get(1).getKey());
 			}
 			H.put(dest,curr);
 		}
@@ -162,14 +159,10 @@ public class Arena {
             int dest = current.getKey();
             DWGraph_Algo Algo = new DWGraph_Algo();
             Algo.init(this._gg);
-            //Algo.shortestPathDist(current.getKey(),this._gg.getE(current.getKey()).iterator().next().getDest());
             HashMap<Integer,Double> curr = new HashMap<>();
-//			Iterator <node_data> itcurr;
-//			itcurr = A.iterator();
-            System.out.println("filling hashmap of node: "+current.getKey()+"...");
             for (node_data n: Algo.getGraph().getV()) {
-                //System.out.println("now running on node: "+n.getKey());
-                curr.put(n.getKey(),Algo.shortestPathDist(n.getKey(),dest));// <<<<<<<<<<<<<<<<<<<
+
+                curr.put(n.getKey(),Algo.shortestPathDist(n.getKey(),dest));
             }
             H.put(dest,curr);
         }
